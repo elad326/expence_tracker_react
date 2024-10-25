@@ -1,0 +1,113 @@
+יצירת Build an Expense Tracker
+---------------------------------------
+
+פלייליסט כולו :
+-----------------
+https://www.youtube.com/watch?v=XuFDcZABiDQ&list=PLillGF-RfqbY3c2r0htQyVbDJJoBFE6Rb&index=1
+
+הסרטון :
+-----------
+https://youtu.be/XuFDcZABiDQ?si=i3fDwKqDhD0wWNUn
+
+
+הפרויקט שלו בונילה JS 
+בגיט האב :
+-------------------------
+https://github.com/bradtraversy/vanillawebprojects/tree/master/expense-tracker
+
+
+***************************
+עצרתי בדקה 40 
+
+
+בסרטון זה - הוא יצר סטייט גלובלי 
+יש הסבר מאד נחמד לכל הפעולות שעשה 
+שלקחתי מתוך -- chat GPT 
+----------------------------------
+
+Let's break down the code you provided into simple concepts:
+
+1. Global State (Initial State)
+The initialState is an object that defines the initial or default state of your app. In this case, it has a property called transactions, which is an array of some transactions (e.g., flower, salary, book, camera). Each transaction has an id, text, and amount.
+
+javascript
+Copy code
+const initialState = {
+    transactions: [
+        { id: 1, text: 'Flower', amount: -20 },
+        { id: 2, text: 'Salary', amount: 300 },
+        { id: 3, text: 'Book', amount: -10 },
+        { id: 4, text: 'Camera', amount: 150 }
+    ]
+};
+This initial state will be shared across different components in your app, and any component can access or update this data.
+
+2. Create Context
+The createContext() function is used to create a Context in React. Think of this context as a way to share data between components without passing props down manually through every component.
+
+Here, you're creating a GlobalContext that will store the data from the initialState and make it available to the rest of the app.
+
+javascript
+Copy code
+export const GlobalContext = createContext(initialState);
+This line creates the GlobalContext that you'll use to access and share the global state across components.
+
+3. Global Provider (Managing Global State)
+The GlobalProvider is a component that will "wrap" the rest of your app. Inside this provider, you define the logic for how the state can be modified and accessed. This makes the state available to all components inside the app that need it.
+
+javascript
+Copy code
+export const GlobalProvider = ({ children }) => {
+    const [state, dispatch] = useReducer(AppReducer, initialState);
+
+    return (
+        <GlobalContext.Provider value={{
+            transactions: state.transactions
+        }}>
+            {children}
+        </GlobalContext.Provider>
+    );
+}
+Here's what's happening step by step:
+
+useReducer: This hook manages complex state logic (such as adding, deleting, or updating a transaction). It's similar to useState, but it's more powerful because it allows you to handle more complex state transitions. The useReducer takes two arguments:
+
+AppReducer (not defined here but likely is defined elsewhere in your code) – this will define how the state changes based on specific actions.
+initialState – the state we defined earlier that contains the initial set of transactions.
+state contains the current state, and dispatch is a function that triggers state updates based on the actions defined in the reducer.
+
+GlobalContext.Provider: The GlobalProvider component wraps other components and provides them access to the global state. The value prop defines what data is shared – here, it is passing the transactions array (state.transactions) as the value to be shared globally.
+
+{children}: This is a special prop that represents all the child components inside the GlobalProvider. By using {children}, we ensure that any components that are wrapped in the GlobalProvider have access to the state.
+
+4. Putting It All Together
+This setup is using Context API and useReducer to manage global state. Essentially:
+
+GlobalContext: Created to store and share data globally across components.
+GlobalProvider: A component that wraps around other components and gives them access to the shared data (transactions).
+useReducer: Manages the state (here, it’s managing transactions) and will be updated based on certain actions (likely defined in AppReducer).
+Example of How You Might Use It
+jsx
+Copy code
+import React, { useContext } from 'react';
+import { GlobalContext } from './GlobalProvider';
+
+function TransactionsList() {
+  const { transactions } = useContext(GlobalContext);
+
+  return (
+    <ul>
+      {transactions.map(transaction => (
+        <li key={transaction.id}>
+          {transaction.text}: ${transaction.amount}
+        </li>
+      ))}
+    </ul>
+  );
+}
+In this example, we are using useContext(GlobalContext) to access the transactions data from the global state and render it as a list.
+
+Summary:
+Context API: Used to share data (state) across multiple components without needing to pass props down manually.
+GlobalProvider: A wrapper that makes state available to any component inside it.
+useReducer: Manages state transitions (like adding or removing transactions).
